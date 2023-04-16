@@ -44,6 +44,30 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 });
 
 
+/** POST /[username]/jobs/[id] => { applied: jobId }
+ * 
+ * Creates a job application for specified user applying to specified job id.
+ * 
+ * This route can be used by admin or the specified user themself.
+ * 
+ * Returns { applied: jobId }
+ * 
+ * Authorization required: admin OR target user
+ * 
+ * TODO: Document and write tests for route, model, etc.
+ */
+
+router.post("/:username/jobs/:id", ensureAdminOrCorrectUser, async function (req, res, next) {
+  try {
+    const { username, id } = req.params;
+    await User.apply(username, id);
+    return res.json({ applied: id });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
 /** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
  *
  * Returns list of all users.
@@ -63,7 +87,8 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 
 /** GET /[username] => { user }
  *
- * Returns { username, firstName, lastName, isAdmin }
+ * Returns { username, firstName, lastName, isAdmin, jobs }
+ *  where jobs is an array of jobs user has applied to: [ jobId, jobId, ...]
  *
  * Authorization required: admin OR logged in as target user
  **/

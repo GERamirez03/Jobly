@@ -139,6 +139,18 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
 
+    // get array of their jobs too... could be one join query?
+    const jobsRes = await db.query(`
+        SELECT job_id AS "jobId"
+        FROM applications
+        WHERE username = $1`,
+      [username]);
+
+    // can be empty array
+    const jobs = jobsRes.rows.map(job => job.jobId);
+
+    user.jobs = jobs;
+
     return user;
   }
 
@@ -192,16 +204,17 @@ class User {
 
   /** Create a job application for provided username for provided job id. */
 
-  static async apply(username, id) {
+  static async apply(username, jobId) {
     const result = await db.query(`
-      INSERT INTO applications (username, job_id) 
+      INSERT INTO applications
+      (username, job_id) 
       VALUES ($1, $2) 
       RETURNING username, job_id AS "jobId"`, 
-      [username, id]);
+      [username, jobId]);
 
     const application = result.rows[0];
 
-    if (!application) throw new BadRequestError(`Could not create application to job ${id} for user ${username}.`);
+    if (!application) throw new BadRequestError(`Could not create application to job ${jobId} for user ${username}.`);
 
     return application;
   }
