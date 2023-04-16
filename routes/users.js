@@ -27,7 +27,7 @@ const router = express.Router();
  * Authorization required: admin
  **/
 
-router.post("/", ensureAdmin, async function (req, res, next) {
+router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, userNewSchema);
     if (!validator.valid) {
@@ -57,7 +57,7 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * TODO: Document and write tests for route, model, etc.
  */
 
-router.post("/:username/jobs/:id", ensureAdminOrCorrectUser, async function (req, res, next) {
+router.post("/:username/jobs/:id", ensureLoggedIn, ensureAdminOrCorrectUser, async function (req, res, next) {
   try {
     const { username, id } = req.params;
     await User.apply(username, id);
@@ -75,7 +75,7 @@ router.post("/:username/jobs/:id", ensureAdminOrCorrectUser, async function (req
  * Authorization required: admin
  **/
 
-router.get("/", ensureAdmin, async function (req, res, next) {
+router.get("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
   try {
     const users = await User.findAll();
     return res.json({ users });

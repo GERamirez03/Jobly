@@ -107,7 +107,7 @@ class Job {
 
         if (!job) throw new NotFoundError(`No job with id ${id}`);
 
-        return id;
+        return job;
     }
 
     /** Delete given job from db. Returns undefined.
