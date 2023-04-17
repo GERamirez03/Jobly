@@ -54,33 +54,32 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   try {
-    // empty query string -> return all companies
-    if (req.query.keys.length === 0) { // okay this condition needs fixing im tired
-
+    // If query string empty, return list of all company objects
+    if (Object.keys(req.query).length === 0) {
       const companies = await Company.findAll();
       return res.json({ companies });
 
-    } else { // non-empty query string -> parse for filter search
+    } else { // Otherwise, perform a filter search
+      const searchParams = Object.keys(req.query);
 
-      // unsupported filter -> Bad Request Error
-      req.query.keys.forEach( key => {
-        if (!(key in ["minEmployees", "maxEmployees", "name"])) {
-          throw new ExpressError(`Filter ${key} is not supported`, 400);
+      // Ensure that we support all of the filters passed to us
+      searchParams.forEach(param => {
+        if (!["minEmployees", "maxEmployees", "name"].includes(param)) {
+          throw new ExpressError(`Filter ${param} is not supported`, 400);
         }
       });
 
-      // if present, convert min & max Employees to int and ensure that min <= max
-      if (req.query.minEmployees) req.query.minEmployees = parseInt(req.query.minEmployees);
-      if (req.query.maxEmployees) req.query.maxEmployees = parseInt(req.query.maxEmployees);
+      // Ensure that minEmployees is not greater than maxEmployees (if both were passed)
       if (req.query.minEmployees && req.query.maxEmployees && req.query.minEmployees > req.query.maxEmployees) {
         throw new ExpressError("minEmployees cannot be greater than maxEmployees", 400);
       }
 
-      // perform filter search from query string parameters
+      // call Company's filterSearch method with the req.query object passed in
       const companies = await Company.filterSearch(req.query);
 
-      // --> when we pass the filter data off to the model, make sure it looks like {name: "net", minEmployees: 15, maxEmployees: 200} **does not need to have all 3
-      return res.json({ companies });}
+      // return the resulting array of relevant companies
+      return res.json({ companies });
+    }
   } catch (err) {
     return next(err);
   }

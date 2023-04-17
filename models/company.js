@@ -83,6 +83,8 @@ class Company {
         }
     );
 
+    console.log(filterCols, values);
+
     const querySql = `SELECT handle, 
                              name, 
                              description, 
@@ -91,7 +93,7 @@ class Company {
                       FROM companies
                       WHERE ${filterCols}`;
     console.log(querySql);
-    const results = await db.query(querySql, [values]);
+    const results = await db.query(querySql, values);
 
     return results.rows;
 

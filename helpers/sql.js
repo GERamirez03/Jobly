@@ -29,7 +29,7 @@ function sqlForFilterSearch(searchFilters, jsToSql) {
   );
 
   return {
-    filterCols: cols.join(", "),
+    filterCols: cols.join(" AND "),
     values: Object.values(searchFilters)
   };
 }
