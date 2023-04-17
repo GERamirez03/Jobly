@@ -56,10 +56,29 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
     try {
-        // for now, just fetch all jobs. filtering TBD
+        // create an array with request's query string search parameters
+        const searchParams = Object.keys(req.query);
 
-        const jobs = await Job.findAll();
-        return res.json({ jobs });
+        // If searchParams is empty, return list of all jobs
+        if (searchParams.length === 0) {
+            const jobs = await Job.findAll();
+            return res.json({ jobs });
+            
+        } else { // Otherwise, perform a filter search
+
+            // Ensure that we support all of the job filters passed
+            searchParams.forEach(param => {
+                if (!["title", "minSalary", "hasEquity"].includes(param)) {
+                    throw new ExpressError(`Filter ${param} is not supported`, 400);
+                }
+            });
+
+            // pass req.query to Job's filterSearch method
+            const jobs = await Job.filterSearch(req.query);
+
+            // return array of relevant jobs
+            return res.json({ jobs });            
+        }
     } catch (err) {
         return next(err);
     }

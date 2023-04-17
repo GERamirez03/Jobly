@@ -18,7 +18,8 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 // sql helper for filter search
-// searchFilters = { name: '%net%', minEmployees: 15, maxEmployees: 200}
+// searchFilters = { name: '%net%', minEmployees: 15, maxEmployees: 200 }
+// searchFilters = { title: '%engineer%', minSalary: 50000, hasEquity: t }
 
 function sqlForFilterSearch(searchFilters, jsToSql) {
   const keys = Object.keys(searchFilters);

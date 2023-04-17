@@ -54,13 +54,15 @@ router.post("/", ensureAdmin, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   try {
+    // create array with request's query string search params
+    const searchParams = Object.keys(req.query);
+
     // If query string empty, return list of all company objects
-    if (Object.keys(req.query).length === 0) {
+    if (searchParams.length === 0) {
       const companies = await Company.findAll();
       return res.json({ companies });
 
     } else { // Otherwise, perform a filter search
-      const searchParams = Object.keys(req.query);
 
       // Ensure that we support all of the filters passed to us
       searchParams.forEach(param => {

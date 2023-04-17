@@ -69,7 +69,7 @@ class Company {
    * - minEmployees
    * - maxEmployees
    * - nameLike (will find case-insensitive, partial matches)
-   */
+   * */
 
   static async filterSearch(filters) {
     if (filters.name) filters.name = `%${filters.name}%`; // <-- consider having this in route instead!
@@ -83,8 +83,6 @@ class Company {
         }
     );
 
-    console.log(filterCols, values);
-
     const querySql = `SELECT handle, 
                              name, 
                              description, 
@@ -92,11 +90,10 @@ class Company {
                              logo_url AS "logoUrl" 
                       FROM companies
                       WHERE ${filterCols}`;
-    console.log(querySql);
+
     const results = await db.query(querySql, values);
 
     return results.rows;
-
   }
 
     /**const response = db.query(`

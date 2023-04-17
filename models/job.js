@@ -49,7 +49,54 @@ class Job {
         return jobsRes.rows;
     }
 
-    /** Filter search for jobs... TBD */
+    /** Given search criteria, return relevant jobs.
+     * 
+     * Returns [{ id, title, salary, equity, company_handle }, ...]
+     * 
+     * Can filter by:
+     * - title (case-insensitive, partial matches)
+     * - minSalary
+     * - hasEquity (Boolean, default false)
+     * */
+
+    static async filterSearch(filters) {
+        if (filters.title) filters.title = `%${filters.title}%`;
+        let equity;
+
+        if (filters.hasEquity) {
+            equity = true;
+            delete filters.hasEquity;
+        }
+
+        const jsToSql = {
+            title: "title ILIKE",
+            minSalary: "salary >="
+        };
+
+        // if (filters.hasEquity) {
+        //     jsToSql.hasEquity = "equity > 0";
+        // }
+        // const equity = (filters.hasEquity) ? "equity > 0" : ""; 
+
+        let { filterCols, values } = sqlForFilterSearch(filters, jsToSql);
+
+        if (equity) {
+            if (filters.title || filters.minSalary) filterCols += " AND";
+            filterCols = filterCols + " equity > 0";
+        }
+
+        const querySql = `SELECT id,
+                                 title,
+                                 salary,
+                                 equity,
+                                 company_handle AS "companyHandle"
+                          FROM jobs
+                          WHERE ${filterCols}`;
+
+        const results = await db.query(querySql, values);
+
+        return results.rows;
+    }
 
     /** Given a job id, return data about job.
      * 
