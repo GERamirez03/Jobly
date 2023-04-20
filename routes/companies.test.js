@@ -96,6 +96,37 @@ describe("GET /companies", function () {
     });
   });
 
+  test("filter search works with supported filters", async function () {
+    const filters = "?name=c&minEmployees=2";
+    const resp = await request(app).get(`/companies${filters}`);
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      companies:
+          [
+            {
+              handle: "c2",
+              name: "C2",
+              description: "Desc2",
+              numEmployees: 2,
+              logoUrl: "http://c2.img",
+            },
+            {
+              handle: "c3",
+              name: "C3",
+              description: "Desc3",
+              numEmployees: 3,
+              logoUrl: "http://c3.img",
+            },
+          ],
+    });
+  });
+
+  test("responds with 400 for unsupported filter", async function () {
+    const badFilter = "?industry=accounting";
+    const resp = await request(app).get(`/companies${badFilter}`);
+    expect(resp.statusCode).toEqual(400);
+  });
+
   test("fails: test next() handler", async function () {
     // there's no normal failure event which will cause this route to fail ---
     // thus making it hard to test that the error-handler works with it. This
