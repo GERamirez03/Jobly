@@ -98,6 +98,7 @@ describe("get", function () {
       description: "Desc1",
       numEmployees: 1,
       logoUrl: "http://c1.img",
+      jobs: []
     });
   });
 
@@ -109,6 +110,140 @@ describe("get", function () {
       expect(err instanceof NotFoundError).toBeTruthy();
     }
   });
+});
+
+/************************************** filterSearch */
+
+describe("filterSearch", function() {
+  test("name filter works", async function () {
+    const data = { name: "C1" };
+    const companies = await Company.filterSearch(data);
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+    ]);
+  });
+
+  test("minEmployees filter works", async function () {
+    const data = { minEmployees: 2 };
+    const companies = await Company.filterSearch(data);
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  test("maxEmployees filter works", async function () {
+    const data = { maxEmployees: 2 };
+    const companies = await Company.filterSearch(data);
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+
+  test("name & minEmployees filters work together", async function () {
+    const data = { name: "c", minEmployees: 3 };
+    const companies = await Company.filterSearch(data);
+    expect(companies).toEqual([
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  test("name & maxEmployees filters work together", async function () {
+    const data = { name: "2", maxEmployees: 2 };
+    const companies = await Company.filterSearch(data);
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+
+  test("name & maxEmployees filters work together", async function () {
+    const data = { name: "1", maxEmployees: 1 };
+    const companies = await Company.filterSearch(data);
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+    ]);
+  });
+
+  test("name, minEmployees & maxEmployees filters work together", async function () {
+    const data = { name: "c", minEmployees: 1, maxEmployees: 3 };
+    const companies = await Company.filterSearch(data);
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
+      },
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
+      {
+        handle: "c3",
+        name: "C3",
+        description: "Desc3",
+        numEmployees: 3,
+        logoUrl: "http://c3.img",
+      },
+    ]);
+  });
+
+  // test("responds with 400 if minEmployees > maxEmployees", async function () {
+  //   //
+  // }); THIS IS A ROUTE TEST!
 });
 
 /************************************** update */
