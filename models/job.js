@@ -171,7 +171,7 @@ class Job {
             [id]);
         const job = result.rows[0];
 
-        if (!company) throw new NotFoundError(`No job with id ${id}`);
+        if (!job) throw new NotFoundError(`No job with id ${id}`);
     }
 }
 
